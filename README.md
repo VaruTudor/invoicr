@@ -2,6 +2,8 @@
 
 > Create, preview, and export professional invoices in seconds.
 
+🔗 **[Live Demo](https://invoicr-wine.vercel.app)**
+
 ![App Screenshot](./screenshots/dashboard.png)
 
 ## Overview
@@ -99,10 +101,14 @@ ALLOWED_ORIGINS=http://localhost:5173
 - Frontend: deploy to [Vercel](https://vercel.com) — connect your GitHub repo and set `VITE_API_URL`
 - Backend: deploy to [Render](https://render.com) — set environment variables in the dashboard
 
+## License
+
+MIT
+
 ## Author
 
 **Tudor Goian** — [github.com/VaruTudor](https://github.com/VaruTudor)
 
 ---
 
-*Built with spec-driven development and AI-accelerated workflows.*
+*Built with spec-driven development*
