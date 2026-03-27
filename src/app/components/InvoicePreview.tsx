@@ -1,4 +1,4 @@
-import { FileText } from 'lucide-react';
+import { useRef, useEffect, useState } from 'react';
 import { InvoiceData } from '../App';
 
 interface InvoicePreviewProps {
@@ -6,9 +6,36 @@ interface InvoicePreviewProps {
   subtotal: number;
   tax: number;
   total: number;
+  logoDataUrl?: string | null;
+  onLogoClick?: () => void;
 }
 
-export function InvoicePreview({ invoiceData, subtotal, tax, total }: InvoicePreviewProps) {
+export function InvoicePreview({ invoiceData, subtotal, tax, total, logoDataUrl, onLogoClick }: InvoicePreviewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const card = cardRef.current;
+    if (!container || !card) return;
+
+    const updateScale = () => {
+      const containerHeight = container.clientHeight;
+      const containerWidth = container.clientWidth;
+      const cardHeight = card.scrollHeight;
+      const cardWidth = card.scrollWidth;
+      const scaleY = containerHeight / cardHeight;
+      const scaleX = containerWidth / cardWidth;
+      setScale(Math.min(scaleX, scaleY, 1));
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(container);
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, [invoiceData, subtotal, tax, total]);
   const getCurrencySymbol = (currency: string) => {
     const symbols: { [key: string]: string } = {
       USD: '$',
@@ -26,14 +53,26 @@ export function InvoicePreview({ invoiceData, subtotal, tax, total }: InvoicePre
   const currencySymbol = getCurrencySymbol(invoiceData.currency);
 
   return (
-    <div className="bg-white text-black rounded-2xl shadow-2xl min-h-[800px] overflow-hidden">
+    <div ref={containerRef} className="w-full h-full">
+    <div
+      ref={cardRef}
+      className="bg-white text-black rounded-2xl shadow-2xl min-h-[800px] overflow-hidden origin-top-left"
+      style={{ transform: `scale(${scale})` }}
+    >
       {/* Accent stripe */}
       <div className="h-1 bg-gradient-to-r from-[#0A84FF] to-[#0A84FF]/60"></div>
-      
+
       <div className="p-12">
         {/* Logo Placeholder */}
-        <div className="mb-16 inline-flex items-center justify-center px-6 py-3 border-2 border-gray-200 rounded-lg">
-          <span className="text-sm tracking-wide text-gray-400">YOUR LOGO</span>
+        <div
+          onClick={onLogoClick}
+          className="mb-16 inline-flex items-center justify-center px-6 py-3 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-gray-400 transition-colors overflow-hidden"
+        >
+          {logoDataUrl ? (
+            <img src={logoDataUrl} alt="Logo" className="max-h-16 max-w-[200px] object-contain" />
+          ) : (
+            <span className="text-sm tracking-wide text-gray-400">YOUR LOGO</span>
+          )}
         </div>
 
         {/* Header */}
@@ -151,6 +190,7 @@ export function InvoicePreview({ invoiceData, subtotal, tax, total }: InvoicePre
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

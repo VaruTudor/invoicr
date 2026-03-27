@@ -29,3 +29,5 @@ vite.config.ts.timestamp-*
 .claude
 _bmad
 _bmad-output
+
+backend/__pycache__
